@@ -52,23 +52,59 @@
     }
     .avatar-wrapper {
       position: relative;
-      width: 155px;
-      height: 155px;
+      width: 165px;
+      height: 165px;
       border-radius: 50%;
       padding: 4px;
       background: linear-gradient(135deg, #38bdf8, #818cf8);
       box-shadow: 0 0 22px rgba(56, 189, 248, 0.35);
       transition: transform 0.12s ease-out, box-shadow 0.3s ease, background 0.3s ease;
       animation: breathe 3.5s ease-in-out infinite;
+      cursor: pointer;
     }
-    .avatar-wrapper img {
+    .avatar-inner {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: top center;
       border-radius: 50%;
-      background: #fff;
+      background: radial-gradient(circle at 50% 45%, #fdf8f5 0%, #dcd4e8 100%);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .avatar-inner svg {
+      width: 100%;
+      height: 100%;
       display: block;
+    }
+
+    /* Animaciones internas del SVG */
+    #character-head {
+      transform-origin: 200px 260px;
+      animation: headIdle 4s ease-in-out infinite;
+    }
+    #ear-left {
+      transform-origin: 165px 95px;
+      animation: earTwitchLeft 5.2s ease-in-out infinite;
+    }
+    #ear-right {
+      transform-origin: 265px 125px;
+      animation: earTwitchRight 4.7s ease-in-out infinite;
+    }
+
+    @keyframes headIdle {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(1.2deg); }
+    }
+    @keyframes earTwitchLeft {
+      0%, 90%, 100% { transform: rotate(0deg); }
+      94% { transform: rotate(-6deg); }
+      97% { transform: rotate(2deg); }
+    }
+    @keyframes earTwitchRight {
+      0%, 85%, 100% { transform: rotate(0deg); }
+      89% { transform: rotate(7deg); }
+      93% { transform: rotate(-2deg); }
     }
 
     /* Estados de ánimo y acción */
@@ -85,7 +121,7 @@
       background: linear-gradient(135deg, #f472b6, #fbbf24);
       box-shadow: 0 0 26px rgba(244, 114, 182, 0.55);
     }
-    .avatar-wrapper.preocupada, .avatar-wrapper.cansada {
+    .avatar-wrapper.preocupada, .avatar-wrapper.cansada, .avatar-wrapper.aburrida {
       background: linear-gradient(135deg, #6366f1, #64748b);
       box-shadow: 0 0 18px rgba(99, 102, 241, 0.4);
     }
@@ -203,8 +239,126 @@
   </header>
 
   <div class="avatar-stage">
-    <div class="avatar-wrapper" id="avatar-box">
-      <img src="chikawa.jpg" alt="Chikawa" />
+    <div class="avatar-wrapper" id="avatar-box" title="Haz clic para parpadear">
+      <div class="avatar-inner">
+        <!-- SVG Rediseñado con viewBox encuadrado al busto y rostro -->
+        <svg id="chikawa-svg" viewBox="45 15 310 355" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="eyeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#6b3e11" />
+              <stop offset="50%" stop-color="#d48817" />
+              <stop offset="100%" stop-color="#ffd54f" />
+            </linearGradient>
+            <linearGradient id="hairGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#9e6b4b" />
+              <stop offset="100%" stop-color="#784b30" />
+            </linearGradient>
+            <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffe7d6" />
+              <stop offset="100%" stop-color="#f7cfb8" />
+            </linearGradient>
+          </defs>
+
+          <!-- LISTÓN ROJO TRASERO -->
+          <g id="back-ribbon" stroke="#3b231d" stroke-width="3" stroke-linejoin="round">
+            <path d="M 110 260 L 40 330 L 65 345 L 125 280 Z" fill="#c93b4b"/>
+            <path d="M 290 260 L 360 330 L 335 345 L 275 280 Z" fill="#c93b4b"/>
+          </g>
+
+          <!-- CABELLO TRASERO -->
+          <path d="M 115 150 C 75 200, 75 285, 115 325 C 145 355, 255 355, 285 325 C 325 285, 325 200, 285 150 Z" 
+                fill="#6e4229" stroke="#3b231d" stroke-width="3.5"/>
+
+          <!-- CUERPO Y ATUENDO -->
+          <g id="outfit" stroke="#3b231d" stroke-width="3" stroke-linejoin="round">
+            <rect x="184" y="255" width="32" height="30" rx="10" fill="url(#skinGrad)"/>
+            <path d="M 125 290 C 145 275, 255 275, 275 290 L 295 390 L 105 390 Z" fill="#ffffff"/>
+            <path d="M 192 290 L 192 350 M 208 290 L 208 350" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4 3"/>
+            <path d="M 125 305 C 95 315, 85 355, 80 395 L 125 395 Z" fill="#ffffff"/>
+            <path d="M 275 305 C 305 315, 315 355, 320 395 L 275 395 Z" fill="#ffffff"/>
+            <path d="M 155 325 L 245 325 L 238 395 L 162 395 Z" fill="#c93b4b"/>
+            <path d="M 142 282 L 165 285 L 162 395 L 135 395 Z" fill="#7a4c32"/>
+            <path d="M 258 282 L 235 285 L 238 395 L 265 395 Z" fill="#7a4c32"/>
+            <g stroke="#5c568a" stroke-width="2.5">
+              <line x1="175" y1="335" x2="225" y2="355"/>
+              <line x1="225" y1="335" x2="175" y2="355"/>
+            </g>
+            <path d="M 168 278 L 200 298 L 178 308 Z" fill="#dce7f2"/>
+            <path d="M 232 278 L 200 298 L 222 308 Z" fill="#dce7f2"/>
+            <!-- Moño lila -->
+            <path d="M 200 298 L 162 282 C 155 295, 160 312, 172 315 L 200 304 Z" fill="#9b95c9"/>
+            <path d="M 200 298 L 238 282 C 245 295, 240 312, 228 315 L 200 304 Z" fill="#9b95c9"/>
+            <path d="M 192 305 L 176 340 L 194 336 L 200 308 Z" fill="#8b85bd"/>
+            <path d="M 208 305 L 224 340 L 206 336 L 200 308 Z" fill="#8b85bd"/>
+            <rect x="191" y="292" width="18" height="16" rx="6" fill="#aba5d9"/>
+          </g>
+
+          <!-- GRUPO CABEZA ANIMADA -->
+          <g id="character-head">
+            <!-- OREJA IZQUIERDA -->
+            <g id="ear-left" stroke="#3b231d" stroke-width="3" stroke-linejoin="round">
+              <path d="M 155 105 C 152 60, 168 25, 182 22 C 192 25, 195 65, 188 100 Z" fill="#875638"/>
+              <path d="M 165 95 C 164 68, 173 42, 180 40 C 184 44, 185 70, 181 92 Z" fill="#3b231d"/>
+              <circle cx="156" cy="72" r="7.5" fill="#4aa3ba"/>
+              <circle cx="152" cy="85" r="7.5" fill="#d64550"/>
+            </g>
+
+            <!-- OREJA DERECHA -->
+            <g id="ear-right" stroke="#3b231d" stroke-width="3" stroke-linejoin="round">
+              <path d="M 260 112 C 295 90, 335 78, 345 85 C 345 98, 310 125, 272 135 Z" fill="#875638"/>
+              <path d="M 270 116 C 295 102, 322 93, 328 97 C 327 104, 302 120, 276 127 Z" fill="#3b231d"/>
+            </g>
+
+            <!-- ROSTRO -->
+            <path d="M 132 165 C 132 115, 268 115, 268 165 C 268 225, 240 264, 200 264 C 160 264, 132 225, 132 165 Z" 
+                  fill="url(#skinGrad)" stroke="#3b231d" stroke-width="3.2"/>
+
+            <!-- MEJILLAS / SONROJO -->
+            <g id="blush-group" opacity="0.65">
+              <ellipse cx="156" cy="212" rx="13" ry="7" fill="#ff8a8a"/>
+              <ellipse cx="244" cy="212" rx="13" ry="7" fill="#ff8a8a"/>
+              <line x1="150" y1="210" x2="147" y2="215" stroke="#e05656" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="156" y1="210" x2="153" y2="215" stroke="#e05656" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="244" y1="210" x2="241" y2="215" stroke="#e05656" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="250" y1="210" x2="247" y2="215" stroke="#e05656" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+
+            <!-- NARIZ -->
+            <path d="M 199 208 Q 202 211 199 214" fill="none" stroke="#8c5843" stroke-width="2.2" stroke-linecap="round"/>
+
+            <!-- ELEMENTOS DINÁMICOS DEL ROSTRO -->
+            <g id="eyes-container"></g>
+            <g id="eyebrows-container"></g>
+            <g id="mouth-container"></g>
+            <g id="extra-fx-container"></g>
+
+            <!-- FLEQUILLO Y MECHONES -->
+            <g id="front-hair" stroke="#3b231d" stroke-width="3.2" stroke-linejoin="round">
+              <path d="M 138 130 C 102 170, 96 245, 136 290 C 122 245, 128 195, 146 165 Z" fill="url(#hairGrad)"/>
+              <path d="M 262 130 C 298 170, 304 245, 264 290 C 278 245, 272 195, 254 165 Z" fill="url(#hairGrad)"/>
+              <path d="M 130 155 C 130 105, 270 105, 270 155 C 250 140, 225 142, 205 162 C 185 178, 155 178, 130 155 Z" fill="url(#hairGrad)"/>
+              <path d="M 178 148 C 198 132, 225 122, 245 122 C 232 135, 212 146, 185 154 Z" fill="#fff9f5" stroke="none"/>
+              <path d="M 145 110 C 155 145, 182 162, 212 162 C 185 154, 165 138, 156 108 Z" fill="url(#hairGrad)"/>
+              <g stroke="#3b231d" stroke-width="2">
+                <rect x="242" y="152" width="26" height="5" rx="2.5" transform="rotate(-12 242 152)" fill="#c93b4b"/>
+                <rect x="245" y="162" width="26" height="5" rx="2.5" transform="rotate(-12 245 162)" fill="#c93b4b"/>
+              </g>
+            </g>
+
+            <!-- BOINA LILA -->
+            <g id="beret" stroke="#3b231d" stroke-width="3.2" stroke-linejoin="round">
+              <path d="M 132 105 L 96 92 C 90 108, 95 124, 108 128 L 130 120 Z" fill="#c93b4b"/>
+              <path d="M 125 122 L 88 136 C 85 150, 95 162, 110 160 L 132 136 Z" fill="#c93b4b"/>
+              <path d="M 118 125 C 110 85, 215 65, 265 92 C 280 102, 276 122, 260 126 C 215 112, 155 115, 118 125 Z" fill="#a8a3d1"/>
+              <path d="M 192 80 C 180 92, 174 100, 182 106 C 187 109, 191 106, 192 104 C 193 106, 197 109, 202 106 C 210 100, 204 92, 192 80 Z" 
+                    fill="#ffffff" stroke="none"/>
+              <path d="M 192 103 L 187 113 L 197 113 Z" fill="#ffffff" stroke="none"/>
+              <path d="M 118 125 C 155 110, 218 108, 262 124 L 258 138 C 215 122, 155 124, 122 139 Z" fill="#f8fafc"/>
+              <circle cx="255" cy="128" r="3.5" fill="#facc15" stroke-width="2"/>
+            </g>
+          </g>
+        </svg>
+      </div>
     </div>
     <div class="mood-tag" id="mood-label">Estado: Neutral</div>
   </div>
@@ -241,12 +395,159 @@
     const musicBar = document.getElementById("music-bar");
     const songTitleEl = document.getElementById("song-title");
 
+    // Contenedores SVG del rostro
+    const eyesContainer = document.getElementById("eyes-container");
+    const eyebrowsContainer = document.getElementById("eyebrows-container");
+    const mouthContainer = document.getElementById("mouth-container");
+    const extraFxContainer = document.getElementById("extra-fx-container");
+    const blushGroup = document.getElementById("blush-group");
+
     let ytPlayer = null;
     let ytReady = false;
     let currentAudio = null;
     let escuchaContinua = false;
     let animFrameId = null;
+    let animoActual = "neutral";
+    let hablando = false;
 
+    // ── Generadores de partes faciales SVG ──
+    function createOpenEye(cx, cy, scaleY = 1, pupilOffset = {x: 0, y: 0}) {
+      return `
+        <g transform="translate(${cx}, ${cy}) scale(1, ${scaleY})">
+          <ellipse cx="0" cy="0" rx="15" ry="17" fill="#ffffff" stroke="#3b231d" stroke-width="2.5"/>
+          <ellipse cx="${pupilOffset.x}" cy="${1 + pupilOffset.y}" rx="11.5" ry="14" fill="url(#eyeGrad)"/>
+          <ellipse cx="${pupilOffset.x}" cy="${1 + pupilOffset.y}" rx="5.5" ry="7" fill="#3b231d"/>
+          <circle cx="${-4 + pupilOffset.x}" cy="${-5 + pupilOffset.y}" r="3.8" fill="#ffffff"/>
+          <circle cx="${4.5 + pupilOffset.x}" cy="${4 + pupilOffset.y}" r="2" fill="#ffffff"/>
+          <path d="M -17 -4 Q 0 -22 17 -4" fill="none" stroke="#3b231d" stroke-width="4.5" stroke-linecap="round"/>
+        </g>
+      `;
+    }
+
+    function createClosedEye(cx, cy, tipo = "happy") {
+      if (tipo === "tired") {
+        return `<path d="M ${cx - 15} ${cy} Q ${cx} ${cy + 8} ${cx + 15} ${cy}" fill="none" stroke="#3b231d" stroke-width="3.5" stroke-linecap="round"/>`;
+      }
+      return `<path d="M ${cx - 15} ${cy + 2} Q ${cx} ${cy - 14} ${cx + 15} ${cy + 2}" fill="none" stroke="#3b231d" stroke-width="4" stroke-linecap="round"/>`;
+    }
+
+    // Mapeo completo de los estados de ánimo de Chikawa
+    const expresionesChikawa = {
+      neutral: {
+        blush: 0.55,
+        fx: "",
+        eyebrows: `
+          <path d="M 148 166 Q 163 160 176 165" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 224 165 Q 237 160 252 166" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+        `,
+        eyes: () => createOpenEye(163, 188) + createOpenEye(237, 188),
+        mouth: `<path d="M 188 228 Q 200 236 212 228" fill="none" stroke="#3b231d" stroke-width="3" stroke-linecap="round"/>`
+      },
+      contenta: {
+        blush: 0.85,
+        fx: "",
+        eyebrows: `
+          <path d="M 148 164 Q 163 157 176 163" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 224 163 Q 237 157 252 164" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+        `,
+        eyes: () => createOpenEye(163, 188, 1.03) + createOpenEye(237, 188, 1.03),
+        mouth: `
+          <path d="M 185 225 Q 200 229 215 225 C 215 245, 185 245, 185 225 Z" fill="#e86f7c" stroke="#3b231d" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M 190 236 Q 200 231 210 236 C 206 242, 194 242, 190 236 Z" fill="#ff9aa4"/>
+        `
+      },
+      juguetona: {
+        blush: 0.8,
+        fx: "",
+        eyebrows: `
+          <path d="M 148 164 Q 163 158 176 164" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 224 169 Q 237 164 252 170" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+        `,
+        eyes: () => createOpenEye(163, 188, 1, {x: 2, y: 0}) + createClosedEye(237, 190, "happy"),
+        mouth: `
+          <path d="M 188 228 Q 194 235 200 229 Q 206 235 212 228" fill="none" stroke="#3b231d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 195 232 C 195 241, 205 241, 205 232 Z" fill="#ff8a96" stroke="#3b231d" stroke-width="2"/>
+        `
+      },
+      molesta: {
+        blush: 0.7,
+        fx: `
+          <g stroke="#ef4444" stroke-width="2.5" fill="none" stroke-linecap="round">
+            <path d="M 122 145 Q 130 152 124 160"/>
+            <path d="M 136 142 Q 132 150 139 156"/>
+          </g>
+        `,
+        eyebrows: `
+          <path d="M 148 161 L 177 174" fill="none" stroke="#4a2c1d" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M 252 161 L 223 174" fill="none" stroke="#4a2c1d" stroke-width="3.5" stroke-linecap="round"/>
+        `,
+        eyes: () => createOpenEye(163, 189, 0.85, {x: 2, y: 0}) + createOpenEye(237, 189, 0.85, {x: -2, y: 0}),
+        mouth: `
+          <path d="M 188 236 Q 200 225 212 236 C 210 241, 190 241, 188 236 Z" fill="#e86f7c" stroke="#3b231d" stroke-width="2.5"/>
+        `
+      },
+      preocupada: {
+        blush: 0.45,
+        fx: `<path d="M 262 178 Q 267 188 262 194 Q 257 188 262 178 Z" fill="#7dd3fc" stroke="#0284c7" stroke-width="1.5"/>`,
+        eyebrows: `
+          <path d="M 147 172 Q 162 174 176 162" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 224 162 Q 238 174 253 172" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+        `,
+        eyes: () => createOpenEye(163, 190, 0.96, {x: -2, y: 2}) + createOpenEye(237, 190, 0.96, {x: -2, y: 2}),
+        mouth: `<path d="M 190 235 Q 200 227 210 235" fill="none" stroke="#3b231d" stroke-width="2.8" stroke-linecap="round"/>`
+      },
+      cansada: {
+        blush: 0.3,
+        fx: "",
+        eyebrows: `
+          <path d="M 148 170 L 176 167" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 224 167 L 252 170" fill="none" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+        `,
+        eyes: () => createOpenEye(163, 192, 0.65, {x: 0, y: 3}) + createOpenEye(237, 192, 0.65, {x: 0, y: 3}),
+        mouth: `<ellipse cx="200" cy="233" rx="6" ry="7" fill="#e86f7c" stroke="#3b231d" stroke-width="2.2"/>`
+      },
+      aburrida: {
+        blush: 0.25,
+        fx: "",
+        eyebrows: `
+          <line x1="148" y1="168" x2="176" y2="168" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+          <line x1="224" y1="168" x2="252" y2="168" stroke="#4a2c1d" stroke-width="3" stroke-linecap="round"/>
+        `,
+        eyes: () => createOpenEye(163, 191, 0.72, {x: 4, y: -2}) + createOpenEye(237, 191, 0.72, {x: 4, y: -2}),
+        mouth: `<path d="M 190 232 Q 200 230 210 233" fill="none" stroke="#3b231d" stroke-width="2.8" stroke-linecap="round"/>`
+      }
+    };
+
+    function renderizarRostroSVG(animo) {
+      const key = expresionesChikawa[animo] ? animo : "neutral";
+      const exp = expresionesChikawa[key];
+      eyebrowsContainer.innerHTML = exp.eyebrows;
+      eyesContainer.innerHTML = exp.eyes();
+      if (!hablando) mouthContainer.innerHTML = exp.mouth;
+      extraFxContainer.innerHTML = exp.fx;
+      blushGroup.setAttribute("opacity", exp.blush);
+    }
+
+    function parpadear() {
+      if (animoActual === "juguetona") return;
+      const tipoCierre = (animoActual === "cansada" || animoActual === "aburrida") ? "tired" : "happy";
+      eyesContainer.innerHTML = createClosedEye(163, 190, tipoCierre) + createClosedEye(237, 190, tipoCierre);
+      setTimeout(() => {
+        const exp = expresionesChikawa[animoActual] || expresionesChikawa.neutral;
+        eyesContainer.innerHTML = exp.eyes();
+      }, 140);
+    }
+
+    // Parpadeo automático cada 3-6 segundos y al hacer clic
+    setInterval(() => {
+      if (Math.random() > 0.35) parpadear();
+    }, 3200);
+    avatarBox.addEventListener("click", parpadear);
+
+    // Inicializar rostro
+    renderizarRostroSVG("neutral");
+
+    // ── Conexión Backend y Lógica Original ──
     fetch(`${API_URL}/`)
       .then(r => r.json())
       .then(() => {
@@ -273,9 +574,12 @@
 
     function actualizarExpresion(animo) {
       if (!animo) return;
+      const limpio = animo.toLowerCase().trim();
+      animoActual = expresionesChikawa[limpio] ? limpio : "neutral";
       avatarBox.classList.remove("neutral", "contenta", "molesta", "juguetona", "preocupada", "cansada", "aburrida");
-      avatarBox.classList.add(animo);
+      avatarBox.classList.add(animoActual);
       moodLabel.textContent = `Estado: ${animo}`;
+      renderizarRostroSVG(animoActual);
     }
 
     function agregarMensaje(texto, tipo) {
@@ -318,7 +622,7 @@
       } catch (e) {}
     }
 
-    // Reproducción de voz con animación reactiva al volumen (lip-sync / bounce)
+    // Reproducción de voz con lip-sync en la boca del SVG y rebote del avatar
     function reproducirVoz(b64) {
       if (!b64) return;
       if (currentAudio) {
@@ -330,8 +634,8 @@
 
       currentAudio = new Audio(`data:audio/mp3;base64,${b64}`);
       avatarBox.style.animation = "none";
+      hablando = true;
 
-      // Analizador de frecuencia para que el avatar rebote al ritmo de su voz
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const src = ctx.createMediaElementSource(currentAudio);
@@ -344,28 +648,38 @@
         function animarVoz() {
           analyser.getByteFrequencyData(dataArray);
           const avg = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-          const scale = 1 + Math.min(avg / 380, 0.14);
-          const tilt = (avg > 45) ? (Math.sin(Date.now() / 60) * 2.5) : 0;
+          const scale = 1 + Math.min(avg / 420, 0.12);
+          const tilt = (avg > 45) ? (Math.sin(Date.now() / 65) * 2.2) : 0;
           avatarBox.style.transform = `scale(${scale}) rotate(${tilt}deg)`;
+
+          // Apertura de boca dinámica según volumen de voz
+          const apertura = Math.min(Math.max(avg / 9, 2), 13);
+          if (avg > 18) {
+            mouthContainer.innerHTML = `
+              <ellipse cx="200" cy="232" rx="${8 + apertura * 0.35}" ry="${apertura}" fill="#e86f7c" stroke="#3b231d" stroke-width="2.5"/>
+              <ellipse cx="200" cy="${232 + apertura * 0.35}" rx="${5 + apertura * 0.2}" ry="${apertura * 0.45}" fill="#ff9aa4"/>
+            `;
+          } else {
+            mouthContainer.innerHTML = `<path d="M 189 230 Q 200 235 211 230" fill="none" stroke="#3b231d" stroke-width="2.8" stroke-linecap="round"/>`;
+          }
+
           animFrameId = requestAnimationFrame(animarVoz);
         }
         animarVoz();
       } catch (e) {}
 
-      currentAudio.onended = () => {
+      const finalizarVoz = () => {
+        hablando = false;
         cancelAnimationFrame(animFrameId);
         avatarBox.style.transform = "";
         avatarBox.style.animation = "";
+        renderizarRostroSVG(animoActual);
         if (ytReady && ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(80);
         if (escuchaContinua) iniciarReconocimiento();
       };
 
-      currentAudio.play().catch(() => {
-        cancelAnimationFrame(animFrameId);
-        avatarBox.style.transform = "";
-        avatarBox.style.animation = "";
-        if (ytReady && ytPlayer && ytPlayer.setVolume) ytPlayer.setVolume(80);
-      });
+      currentAudio.onended = finalizarVoz;
+      currentAudio.play().catch(finalizarVoz);
     }
 
     async function enviarMensaje(texto) {
