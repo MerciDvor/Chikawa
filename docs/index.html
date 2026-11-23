@@ -241,7 +241,6 @@
   <div class="avatar-stage">
     <div class="avatar-wrapper" id="avatar-box" title="Haz clic para parpadear">
       <div class="avatar-inner">
-        <!-- SVG Rediseñado con viewBox encuadrado al busto y rostro -->
         <svg id="chikawa-svg" viewBox="45 15 310 355" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="eyeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -547,7 +546,7 @@
     // Inicializar rostro
     renderizarRostroSVG("neutral");
 
-    // ── Conexión Backend y Lógica Original ──
+    // ── Conexión Backend y Lógica Principal ──
     fetch(`${API_URL}/`)
       .then(r => r.json())
       .then(() => {
@@ -601,7 +600,7 @@
       if (accion.tipo === "play" && accion.video_id) {
         musicBar.classList.add("active");
         songTitleEl.textContent = accion.titulo || "Reproduciendo...";
-        ytPlayer.setVolume(80);
+        ytPlayer.setVolume(hablando ? 20 : 80);
         ytPlayer.loadVideoById(accion.video_id);
       } else if (accion.tipo === "pausar") {
         ytPlayer.pauseVideo();
@@ -619,6 +618,9 @@
         const res = await fetch(`${API_URL}/autoplay/siguiente`, { method: "POST" });
         const data = await res.json();
         manejarAccionMusica(data.accion);
+        if (data.animo) actualizarExpresion(data.animo);
+        if (data.respuesta) agregarMensaje(data.respuesta, "bot");
+        if (data.audio_b64) reproducirVoz(data.audio_b64);
       } catch (e) {}
     }
 
