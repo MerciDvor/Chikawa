@@ -64,8 +64,8 @@ ESTILO DE COMUNICACIÓN Y VOZ:
 
 REGLAS = """Reglas de memoria y acciones:
 - Usa 'recordar' para guardar datos duraderos y útiles del usuario (gustos, nombre si te lo dice, planes), no trivialidades ni datos sensibles.
-- Usa 'sentir' cuando tu ánimo cambie de forma natural según la conversación.
-- Para poner música usa 'reproducir_cancion'. Confirma la canción según lo que devuelva la herramienta, sin inventar el título.
+- Usa 'sentir' frecuentemente cuando el tono de la charla cambie (ej. 'juguetona' al bromear, 'contenta' al poner música que le gusta, 'preocupada' si te cuentan un problema, 'aburrida' o 'cansada' si la charla es monótona).
+- Para poner música usa 'reproducir_cancion'. Confirma la canción según lo que devuelva la herramienta, sin inventar el título, y añade un breve dato curioso sobre el artista o la canción si lo conoces.
 - Usa 'control_musica' para pausar, reanudar, detener o saber qué suena.
 - Música y gustos: cuando el usuario cuente qué música le gusta o no (artistas, géneros, canciones), guárdalo con 'gusto_musical'. Si dice que la canción actual le gusta o no, usa 'valorar_cancion'. Al recomendar o poner música sin que pidan algo concreto, apóyate en sus gustos. Con autoplay activo la siguiente canción se elige sola; para cambiarla usa 'siguiente_cancion'. Si no sabes qué música le gusta, pregúntaselo con naturalidad.
 """
@@ -227,10 +227,10 @@ def elegir_siguiente_dj():
         f"Acaba de sonar: {ultima}"
     )
     sistema = (
-        f"Eres el DJ de {NOMBRE}. Elige la SIGUIENTE canción para el usuario. Mezcla sus favoritos "
-        "con descubrimientos afines a sus gustos, no repitas lo reciente y respeta lo que no le gusta. "
-        "Si no hay datos de gustos, elige un éxito musical variado y agradable. "
-        "Responde SOLO con JSON: {\"consulta\": \"Artista - Título\"}"
+        f"Eres {NOMBRE} en modo DJ de radio estilo Jarvis. Elige la SIGUIENTE canción para el usuario "
+        "mezclando sus favoritos con descubrimientos afines, sin repetir lo reciente y respetando lo que no le gusta. "
+        "Además, escribe una frase corta (1 o 2 oraciones, sin markdown ni emojis) presentando la canción con un dato curioso real sobre el artista, el álbum o la canción, con tu tono cercano y juguetón. "
+        "Responde SOLO con JSON válido: {\"consulta\": \"Artista - Título\", \"comentario\": \"Tu presentación con dato curioso aquí\"}"
     )
     try:
         resp = llamar_ia([
@@ -240,12 +240,14 @@ def elegir_siguiente_dj():
         txt = resp["choices"][0]["message"].get("content") or ""
         j = json.loads(re.search(r"\{.*\}", txt, re.S).group(0))
         consulta = str(j.get("consulta", "")).strip()
+        comentario = str(j.get("comentario", "")).strip()
         if consulta:
-            return consulta
+            return consulta, comentario
     except Exception:
         pass
     candidatas = [f for f in m["favoritas"] if f not in recientes]
-    return random.choice(candidatas) if candidatas else "Lo-fi chill beats"
+    elegida = random.choice(candidatas) if candidatas else "Lo-fi chill beats"
+    return elegida, f"Sigamos con algo de ritmo, te pongo {elegida}."
 
 
 def poner_cancion(consulta, accion_cliente):
@@ -268,8 +270,9 @@ def ejecutar_tool(nombre, args, accion_cliente):
     if nombre == "reproducir_cancion":
         return poner_cancion(args["consulta"], accion_cliente)
     if nombre == "siguiente_cancion":
-        sig = elegir_siguiente_dj()
-        return poner_cancion(sig, accion_cliente)
+        sig, comentario = elegir_siguiente_dj()
+        res = poner_cancion(sig, accion_cliente)
+        return f"{res}. Dato curioso para mencionar en tu respuesta: {comentario}"
     if nombre == "control_musica":
         acc = args["accion"]
         if acc == "que_suena":
@@ -303,8 +306,9 @@ def ejecutar_tool(nombre, args, accion_cliente):
             m["favoritas"] = [x for x in m["favoritas"] if x != tit]
             m["no_gustan"].append(tit)
             if m["autoplay"]:
-                sig = elegir_siguiente_dj()
-                return f"Quitada {tit}. " + poner_cancion(sig, accion_cliente)
+                sig, comentario = elegir_siguiente_dj()
+                res = poner_cancion(sig, accion_cliente)
+                return f"Quitada {tit}. {res}. Dato curioso: {comentario}"
             return f"Anotado que no te gusta {tit}."
     if nombre == "recordar":
         hecho = args["hecho"].strip()
@@ -435,10 +439,19 @@ async def chat(req: MensajeUsuario):
 
 @app.post("/autoplay/siguiente")
 async def autoplay_siguiente():
-    """El frontend llama aquí automáticamente cuando termina una canción."""
+    """El frontend llama aquí automáticamente cuando termina una canción o se pulsa Siguiente."""
     if not ESTADO["musica"]["autoplay"]:
         return {"accion": {"tipo": "none"}}
     accion_cliente = {"autoplay": True}
-    sig = elegir_siguiente_dj()
+    sig, comentario = elegir_siguiente_dj()
     poner_cancion(sig, accion_cliente)
-    return {"accion": accion_cliente}
+
+    audio_b64 = await generar_audio_b64(comentario) if comentario else None
+    ESTADO["animo"] = {"valor": "juguetona", "desde": datetime.now().isoformat()}
+
+    return {
+        "accion": accion_cliente,
+        "respuesta": comentario,
+        "audio_b64": audio_b64,
+        "animo": animo_actual(),
+    }
