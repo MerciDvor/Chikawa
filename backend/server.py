@@ -416,6 +416,7 @@ async def chat(req: MensajeUsuario):
                 "respuesta": respuesta,
                 "audio_b64": audio_b64,
                 "accion": accion_cliente,
+                "animo": animo_actual(),
             }
 
         mensajes.append(msg)
