@@ -161,7 +161,18 @@
     }
     #music-bar.active { display: flex; }
     #song-title { font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #yt-container { width: 0; height: 0; overflow: hidden; position: absolute; }
+
+    /* Contenedor con dimensiones válidas para evitar bloqueo de autoplay de YouTube */
+    #yt-container {
+      width: 200px;
+      height: 120px;
+      position: fixed;
+      bottom: 80px;
+      right: 14px;
+      opacity: 0.01;
+      pointer-events: none;
+      z-index: -1;
+    }
 
     /* ── Chat ── */
     #chat {
@@ -403,6 +414,7 @@
 
     let ytPlayer = null;
     let ytReady = false;
+    let videoPendiente = null;
     let currentAudio = null;
     let escuchaContinua = false;
     let animFrameId = null;
@@ -559,13 +571,31 @@
 
     function onYouTubeIframeAPIReady() {
       ytPlayer = new YT.Player("yt-player", {
-        height: "1",
-        width: "1",
-        playerVars: { autoplay: 1, controls: 0 },
+        height: "120",
+        width: "200",
+        playerVars: {
+          autoplay: 1,
+          controls: 0,
+          playsinline: 1,
+          origin: window.location.origin
+        },
         events: {
-          onReady: () => { ytReady = true; },
+          onReady: (event) => {
+            ytReady = true;
+            if (videoPendiente) {
+              event.target.setVolume(80);
+              event.target.loadVideoById(videoPendiente);
+              event.target.playVideo();
+              videoPendiente = null;
+            }
+          },
           onStateChange: (event) => {
             if (event.data === 0) pedirSiguienteDJ();
+          },
+          onError: (e) => {
+            console.warn("Error de YouTube (video bloqueado para embed):", e.data);
+            agregarMensaje("Ese video tiene bloqueo de reproducción, saltando a otro...", "sys");
+            pedirSiguienteDJ();
           }
         }
       });
@@ -595,20 +625,24 @@
         badgeDj.textContent = `DJ Autoplay: ${accion.autoplay ? "ON" : "OFF"}`;
         badgeDj.classList.toggle("on", accion.autoplay);
       }
-      if (!ytReady || !ytPlayer) return;
 
       if (accion.tipo === "play" && accion.video_id) {
         musicBar.classList.add("active");
         songTitleEl.textContent = accion.titulo || "Reproduciendo...";
+        if (!ytReady || !ytPlayer) {
+          videoPendiente = accion.video_id;
+          return;
+        }
         ytPlayer.setVolume(hablando ? 20 : 80);
         ytPlayer.loadVideoById(accion.video_id);
-      } else if (accion.tipo === "pausar") {
-        ytPlayer.pauseVideo();
-      } else if (accion.tipo === "reanudar") {
         ytPlayer.playVideo();
-      } else if (accion.tipo === "detener") {
-        ytPlayer.stopVideo();
-        musicBar.classList.remove("active");
+      } else if (ytReady && ytPlayer) {
+        if (accion.tipo === "pausar") ytPlayer.pauseVideo();
+        else if (accion.tipo === "reanudar") ytPlayer.playVideo();
+        else if (accion.tipo === "detener") {
+          ytPlayer.stopVideo();
+          musicBar.classList.remove("active");
+        }
       }
     }
 
